@@ -1,10 +1,8 @@
 const createError = require('http-errors')
-const KikoAnswerService = require('./services/kiko-answer-service')
 const axios = require('axios')
 
-const glossaryBaseUrl = 'https://tgd-kiko-glossary-slmtrsy75a-ew.a.run.app'
+const glossaryBaseUrl = 'https://webservice.kiko.bot/glossary'
 const glossaryApiKey = '827345287346528746'
-
 const eocEvent = {
   type: 'event',
   name: 'endOfConversation'

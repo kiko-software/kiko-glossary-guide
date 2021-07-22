@@ -14,7 +14,7 @@
               "type": "message",
               "data": {
                 "type": "text/plain",
-                "content": "Satz mit CMS und CMS und 123."
+                "content": "Ein Satz mit CMS und CMS und 123."
               }
             }
           ]

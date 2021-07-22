@@ -1,7 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const compress = require('compression')
-const favicon = require('serve-favicon')
 const bodyParser = require('body-parser')
 
 const Functions = require('./functions')
@@ -13,8 +12,6 @@ app.use(cors())
 app.use(compress())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-app.use(favicon('./public/favicon.png'))
-app.use(express.static('./public'))
 
 app.get('/v1/ping', (req, res) => { res.status(200).send('pong.') })
 app.post('/v1/webhook-message-sent', Functions.postWebhookMessageSent)
