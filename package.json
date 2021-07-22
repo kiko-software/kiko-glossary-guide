@@ -1,0 +1,40 @@
+{
+  "name": "kiko-glossary-guide",
+  "version": "1.0.0",
+  "description": "An example Kiko subbot application that shows how to link words in the intent output",
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
+  "author": "Kiko by 1000° DIGITAL GmbH (https://www.kiko.bot)",
+  "contributors": [
+    "Mark Busse <mark@kiko.bot>"
+  ],
+  "homepage": "https://www.kiko.bot",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kiko-software/kiko-boilerplate-subbot.git"
+  },
+  "license": "BSD-2-Clause",
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "http-errors": "^1.8.0",
+    "serve-favicon": "^2.5.0"
+  },
+  "devDependencies": {
+    "ava": "^3.14.0",
+    "eslint": "7.15.0",
+    "eslint-config-prettier": "7.0.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "3.3.0",
+    "eslint-plugin-promise": "4.2.1",
+    "prettier": "2.2.1"
+  },
+  "main": "index.js"
+}

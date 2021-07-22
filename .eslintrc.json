@@ -1,0 +1,21 @@
+{
+    "parserOptions": {
+      "ecmaVersion": 8,
+      "sourceType": "script"
+    },
+    "plugins": [
+      "promise"
+    ],
+    "extends": ["eslint:recommended", "standard"],
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "require-jsdoc": "off",
+      "max-len": "off",
+      "no-console": "off",
+      "quotes": "off",
+      "valid-jsdoc": "off"
+    }
+  }
+  

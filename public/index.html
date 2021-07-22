@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="./favicon.png">    
+    <title>Title of the document</title>
+
+    <!-- custom datepicker lib - BEGIN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.2/dist/css/datepicker.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.2/dist/js/datepicker-full.min.js"></script>       
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.2/dist/js/locales/de.js"></script>
+    <!-- custom datepicker lib - END -->
+
+  </head>
+  <body>
+    Eigener Seiteninhalt.
+
+    <!-- chatbot widget integration snippet - BEGIN -->
+    <script async>
+      const dateElementId = 'mydatepicker'
+      const kikoCmsDomain = "cloud02-7c83ec0.prod.1000grad.de";
+      const kikoBotIdentifier = "6d5abc25-6110-31fa-87a2-77cd2422c3d5";
+      const script = document.createElement('script');
+      script.src = '//' + kikoCmsDomain + '/chat/assets/js/main.js';
+      script.id = 'tgd-chat-script';
+      script.onload = async function () {
+        window.$chatbot = new TGDChatBot({ identifier: kikoBotIdentifier });
+        await window.$chatbot.startApp();
+
+        // find datepicker element in messages - BEGIN --
+        const parser = new DOMParser()
+        window.$chatbot.on('messageReceived', (event) => {
+          event.detail.forEach((message) => {
+            if (message.data.type === 'text/html' && message.data.hasOwnProperty('content')) {
+              const htmlDoc = parser.parseFromString(message.data.content, 'text/html');
+              if (htmlDoc.getElementById(dateElementId)) {
+                const elem = document.getElementById(dateElementId);
+                const datepicker = new Datepicker(elem,{ language: 'de' });
+                elem.addEventListener('changeDate', e => {
+                  window.$chatbot.sendAsUser({ text: Datepicker.formatDate(e.detail.date, 'dd.mm.yyyy', 'de') });
+                });              
+              }
+            }
+          });
+        });
+        // find datepicker element in messages - END --
+
+      };
+      document.getElementsByTagName('body')[0].appendChild(script);
+    </script>
+    <!-- chatbot widget integration snippet - END -->
+
+  </body>
+</html>

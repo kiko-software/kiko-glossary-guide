@@ -1,0 +1,26 @@
+{
+  "conversationId": "15332847254396555b6411757b9517.60411151",
+  "messages": [
+    {
+      "type": "message",
+      "data": {
+        "type": "text/plain",
+        "content": "eine Frage zum Content-Management"
+      },      
+      "metaData": {
+        "intent": {
+          "output": [
+            {
+              "type": "message",
+              "data": {
+                "type": "text/plain",
+                "content": "Satz mit CMS und CMS und 123."
+              }
+            }
+          ]
+        },
+        "glossaryProfileName": "1000grad-cms-assistent-v1"
+      }
+    }
+  ]
+}

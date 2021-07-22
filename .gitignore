@@ -1,0 +1,33 @@
+# Logs
+logs
+
+# keys
+keys
+secrets
+
+# local
+installation-local.md
+
+# Optional npm cache directory
+.npm
+.config
+
+# optional pm2 cache directory
+.pm2
+
+# optional pm2 cache directory
+.pki/*
+
+### System Files ###
+.DS_Store
+.bash_history
+
+# node
+.node_repl_history
+.node-gyp
+
+# Dependency directories
+node_modules
+
+# pdf file destination
+/server/pdfSources/generated
