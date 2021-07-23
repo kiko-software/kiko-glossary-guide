@@ -17,15 +17,83 @@ The processing of the subbot request from the Kiko server takes place in the fil
 At the beginning the web server is initialised.
 The route "/v1/webhook-message-sent" is entered in the webhook of the subbot.
 
+```javascript
+const app = express()
+app.use(cors())
+app.use(compress())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.post('/v1/webhook-message-sent', Functions.postWebhookMessageSent)
+```
 ### src/functions.js
 
 ### postWebhookMessageSent
 The property "glossaryProfileName" contains the name of the glossary database in which the linkable words are stored.
 
+```javascript
+async function postWebhookMessageSent (req, res) {
+  const { conversationId, messages } = req.body
+  const referer = req.get('referer') || req.query.referer
+  const endpointBaseUrl = referer.replace(/\/\//g, 'https://')
+  const metadata = messages[0].metaData
+  if (metadata) { 
+    await sendOutputWithLinkedGlossaryWords({ 
+      messages: metadata.intent.output, 
+      conversationId: conversationId, 
+      endpointBaseUrl: endpointBaseUrl,
+      glossaryProfileName: metadata.glossaryProfileName
+    })
+  }
+  res.status(200).json({ success: true })
+}
+```
+
 ### sendOutputWithLinkedGlossaryWords
 In this function, all messages to be output from the previously recognised chatbot intent are processed individually. If it is a text-only message, all words are detected. Via the function "getGlossaryDescriptionLinks", the corresponding links are fetched from the glossary database.
 
 All links are transferred to the message via a replace function. Because the message now contains links, it is sent as an HTML message.
+
+```javascript
+async function sendOutputWithLinkedGlossaryWords (options) {
+  const { messages, conversationId, endpointBaseUrl, glossaryProfileName } = options
+  const outputMessages = []
+  for (const msg of messages) {
+    let outputMessage
+    if (
+      msg.type === 'message' &&
+      msg.data &&
+      msg.data.type === 'text/plain'
+    ) {
+      const R =  /(\w|\s)*\w(?=")|\w+/g
+      const words = msg.data.content.match(R)
+      const uniqueWords = words.filter((v, i, a) => a.indexOf(v) === i)
+      
+      const glossaryLinks = await getlinks({
+        words: uniqueWords, 
+        glossaryProfileName: glossaryProfileName
+      })
+      
+      let htmlContent = '<p>' + msg.data.content + '</p>'
+      for (const glossaryLink of glossaryLinks) {
+        const link = '<a href="' + glossaryLink.url + '" target="_self" >' + glossaryLink.word + '</a>'
+        htmlContent = htmlContent.replace(new RegExp(glossaryLink.word, 'g'), link)
+      }
+      outputMessage = {
+        type: 'message',
+        data: {
+          type: 'text/html',
+          content: htmlContent
+        }
+      }      
+    } else {
+      outputMessage = msg
+    }
+    outputMessages.push(outputMessage)
+  }
+  outputMessages.push(eocEvent)
+  await sendOutputMessages({ messages: outputMessages, endpointBaseUrl, conversationId })
+}
+```
 
 ## Deployment
 Deploy this app to your account in Google Cloud Run. Your webservice url is something like this: https://kiko-glossary-guide-....a.run.app.
