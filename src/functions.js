@@ -1,12 +1,9 @@
 const createError = require('http-errors')
 const axios = require('axios')
 
+// ---
 const glossaryBaseUrl = 'https://webservice.kiko.bot/glossary'
-const glossaryApiKey = '827345287346528746'
-const eocEvent = {
-  type: 'event',
-  name: 'endOfConversation'
-}
+const glossaryApikey = '827345287346528746' // api key for test purposes
 
 /**
  * sends output messages to kiko bot
@@ -28,25 +25,35 @@ async function sendOutputMessages (options) {
 }
 
 /**
+ * fetches the glossary links from the glossary-db for the words
  * 
  * @param {*} options 
  * @returns 
  */
-async function getGlossaryDescriptionLinks(options) {
+async function getlinks(options) {
   const { glossaryProfileName, words } = options
   const response = await axios({ 
-    url: glossaryBaseUrl + '/v1/get-description-links?api_key=' + glossaryApiKey, 
+    url: glossaryBaseUrl + '/v1/get-links?apikey=' + glossaryApikey, 
     method: 'POST', 
     data: { 
       words: words, 
       glossaryProfileName: glossaryProfileName  
     }
   }).catch((error) => { throw createError(500, error.message) })
-  console.log('getGlossaryDescriptionLinks - response.data:', response.data)
-  return response.data.glossaryDescriptionLinks
+  console.log('getlinks - response.data:', response.data)
+  // expected structure (example): { links: [ {word: 'example word', url: 'example url to a html page with the description of the word' } ] }
+ 
+  return response.data.links
+}
+
+// ---
+const eocEvent = {
+  type: 'event',
+  name: 'endOfConversation'
 }
 
 /**
+ * adds links to the output and sends it to the webchat
  * 
  * @param {*} options 
  */
@@ -70,22 +77,21 @@ async function getGlossaryDescriptionLinks(options) {
       const words = msg.data.content.match(R)
       const uniqueWords = words.filter((v, i, a) => a.indexOf(v) === i)
       
-      const glossaryDescriptionLinks = await getGlossaryDescriptionLinks({
+      const glossaryLinks = await getlinks({
         words: uniqueWords, 
         glossaryProfileName: glossaryProfileName
       })
-      // { links: [ {word: 'example word', url: 'example url to a html page with the description of the word' } ] }
       
       let htmlContent = '<p>' + msg.data.content + '</p>'
       console.log('sendOutputWithLinkedGlossaryWords - htmlContent:', htmlContent)
-      for (const glossaryDescriptionLink of glossaryDescriptionLinks) {
-        const link = '<a href="' + glossaryDescriptionLink.url + '" target="_self" >' + glossaryDescriptionLink.word + '</a>'
-        console.log('sendOutputWithLinkedGlossaryWords - glossaryDescriptionLink.word:', glossaryDescriptionLink.word)
+      for (const glossaryLink of glossaryLinks) {
+        const link = '<a href="' + glossaryLink.url + '" target="_self" >' + glossaryLink.word + '</a>'
+        console.log('sendOutputWithLinkedGlossaryWords - glossaryLink.word:', glossaryLink.word)
         console.log('sendOutputWithLinkedGlossaryWords - link:', link)
 
-        // htmlContent = htmlContent.replaceAll( glossaryDescriptionLink.word, link)
+        // htmlContent = htmlContent.replaceAll( glossaryLink.word, link)
         // For older nodejs versions like 14
-        htmlContent = htmlContent.replace(new RegExp(glossaryDescriptionLink.word, 'g'), link)
+        htmlContent = htmlContent.replace(new RegExp(glossaryLink.word, 'g'), link)
         
         console.log('sendOutputWithLinkedGlossaryWords - htmlContent:', htmlContent)
       }
@@ -101,6 +107,7 @@ async function getGlossaryDescriptionLinks(options) {
     }
     outputMessages.push(outputMessage)
   }
+  outputMessages.push(eocEvent)
   await sendOutputMessages({ messages: outputMessages, endpointBaseUrl, conversationId })
 }
 
@@ -119,7 +126,7 @@ async function postWebhookMessageSent (req, res) {
   const metadata = messages[0].metaData
   console.log('postWebhookMessageSent - messages[0].metaData:', metadata)
   if (metadata) {
-    if (!metadata.intent) { throw createError(500, 'Missing metadata intent.')}
+    if (!metadata.intent) { throw createError(500, 'Missing metadata intent.')}    
     await sendOutputWithLinkedGlossaryWords({ 
       messages: metadata.intent.output, 
       conversationId: conversationId, 
