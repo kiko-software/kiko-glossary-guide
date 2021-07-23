@@ -50,3 +50,7 @@ Deploy this app to your account in Google Cloud Run. Your webservice url is some
 Type "glossary" in the test webchat input. The intent should be recognised and the word "CMS" should be linked in the output.
 
 By clicking on the link, the info area should open above the test webchat with an explanation of the terms. The info area can be closed again with a click.
+
+## Result
+
+![GIF video](docs/kiko-glossary-guide.gif)
